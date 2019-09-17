@@ -41,7 +41,7 @@ $db_con   =   new mysqli(DB_info::DB_URL, DB_info::DB_HOST,
   <link rel="stylesheet" href="../Public/css/main.min.css">
 </head>
 
-<body>
+<body onload="popularProduct()">
 <center>
 
 <?php 
@@ -160,125 +160,7 @@ $user_num_row = mysqli_fetch_array($user_num_result);
   <!-- Product div -->
 <div class="row">
 
-<!-- Product 1 -->
-    <form method="post" class="Speed_Purchasing">
 
-        <div class="col-xs-3 col-md-3" style="margin:0px;">
-    		<div class="thumbnail">
-
-                <!-- Send values in hidden mode -->
-                <input type="hidden" name="p_num" value="<?=$row['p_num']?>"/>
-                <input type="hidden" name="p_count" value="1"/>
-                <input type="hidden" name="p_price"  value="<?=$row['p_price']?>"/>
-                <input type="hidden" name="user_num" value="<?=$user_num_row['user_num']?>"/>
-                <input type="hidden" name="user_id" value="<?=$_SESSION['user_id']?>"/><input type="hidden" name="user_name" value="<?=$_SESSION['user_name']?>"/>
-
-                <!-- Print Product Information from DB -->
-    			<img src="../Public/img/<?=$row['p_img']?>">
-    			<div class="caption">
-    				<h3><strong><?=$row['p_name']?></strong></h3>
-    				<p><?=$row['p_memo']?></p>
-            	<b><?=$row['p_price']?>　円</b><br><br>
-
-                <!-- Buttons that are linked to each function-->
-                <input type="submit" button class="btn btn-warning btn-lg" value= "Buy" onclick="Go_Purchase()">
-
-                <input type="image" button class="btn btn-success btn-lg" src="../Public/img/KAGO2.png" onclick="Go_Cart()">
-    			</div>
-    		</div>
-    	</div>
-    </form>
-
-
-
-<!-- Product 2 -->
-<form method="post" class="Speed_Purchasing">
-
-    <div class="col-xs-3 col-md-3" style="margin:0px;">
-        <div class="thumbnail">
-
-            <!-- Send values in hidden mode -->
-            <input type="hidden" name="p_num" value="<?=$row['p_num']?>"/>
-            <input type="hidden" name="count" value="1"/>
-            <input type="hidden" name="p_price"  value="<?=$row['p_price']?>"/>
-            <input type="hidden" name="user_num" value="<?=$user_num_row['user_num']?>"/>
-            <input type="hidden" name="user_id" value="<?=$_SESSION['user_id']?>"/><input type="hidden" name="user_name" value="<?=$_SESSION['user_name']?>"/>
-
-            <!-- Print Product Information from DB -->
-            <img src="../Public/img/<?=$row['p_img']?>">
-            <div class="caption">
-                <h3><strong><?=$row['p_name']?></strong></h3>
-                <p><?=$row['p_memo']?></p>
-            <b><?=$row['p_price']?>　円</b><br><br>
-
-            <!-- Buttons that are linked to each function-->
-            <input type="submit" button class="btn btn-warning btn-lg" value= "Buy" onclick="Go_Purchase()">
-
-            <input type="image" button class="btn btn-success btn-lg" src="../Public/img/KAGO2.png" onclick="Go_Cart()">
-            </div>
-        </div>
-    </div>
-</form>
-
-
-<!-- Product 3 -->
-<form method="post" class="Speed_Purchasing">
-
-    <div class="col-xs-3 col-md-3" style="margin:0px;">
-        <div class="thumbnail">
-
-            <!-- Send values in hidden mode -->
-            <input type="hidden" name="p_num" value="<?=$row['p_num']?>"/>
-            <input type="hidden" name="count" value="1"/>
-            <input type="hidden" name="p_price"  value="<?=$row['p_price']?>"/>
-            <input type="hidden" name="user_num" value="<?=$user_num_row['user_num']?>"/>
-            <input type="hidden" name="user_id" value="<?=$_SESSION['user_id']?>"/><input type="hidden" name="user_name" value="<?=$_SESSION['user_name']?>"/>
-
-            <!-- Print Product Information from DB -->
-            <img src="../Public/img/<?=$row['p_img']?>">
-            <div class="caption">
-                <h3><strong><?=$row['p_name']?></strong></h3>
-                <p><?=$row['p_memo']?></p>
-            <b><?=$row['p_price']?>　円</b><br><br>
-
-            <!-- Buttons that are linked to each function-->
-            <input type="submit" button class="btn btn-warning btn-lg" value= "Buy" onclick="Go_Purchase()">
-
-            <input type="image" button class="btn btn-success btn-lg" src="../Public/img/KAGO2.png" onclick="Go_Cart()">
-            </div>
-        </div>
-    </div>
-</form>
-
-
-<!-- Product 4 -->
-<form method="post" class="Speed_Purchasing">
-
-    <div class="col-xs-3 col-md-3" style="margin:0px;">
-        <div class="thumbnail">
-
-            <!-- Send values in hidden mode -->
-            <input type="hidden" name="p_num" value="<?=$row['p_num']?>"/>
-            <input type="hidden" name="count" value="1"/>
-            <input type="hidden" name="p_price"  value="<?=$row['p_price']?>"/>
-            <input type="hidden" name="user_num" value="<?=$user_num_row['user_num']?>"/>
-            <input type="hidden" name="user_id" value="<?=$_SESSION['user_id']?>"/><input type="hidden" name="user_name" value="<?=$_SESSION['user_name']?>"/>
-
-            <!-- Print Product Information from DB -->
-            <img src="../Public/img/<?=$row['p_img']?>">
-            <div class="caption">
-                <h3><strong><?=$row['p_name']?></strong></h3>
-                <p><?=$row['p_memo']?></p>
-            <b><?=$row['p_price']?>　円</b><br><br>
-
-            <!-- Buttons that are linked to each function-->
-            <input type="submit" button class="btn btn-warning btn-lg" value= "Buy" onclick="Go_Purchase()">
-
-            <input type="image" button class="btn btn-success btn-lg" src="../Public/img/KAGO2.png" onclick="Go_Cart()">
-            </div>
-        </div>
-    </div>
-</form>
 </div>
 
 
@@ -293,47 +175,59 @@ $user_num_row = mysqli_fetch_array($user_num_result);
   </p>
 
 </footer>
+<div class="test"  hidden name="function" value="test"></div>
 <BR />
 
 </center>
 
 <script>
-  function ajax(){
-    $.ajax({
-      url:"../Controller/Controller.php",
-      type: "post",
-      data:$("form").serialize()
-    }).done(function (data){
-      $("#loginResult").append(data);
-    });
-  }
-
-  function user_Join(){
-    window.open("./user_Join.php","user register", "width:250px, height:250px");
-  }
-
-
-  function Go_Cart(){
-      $(".Speed_Purchasing").attr("action", "../Controller/product_Cart.php");
-
-  }
-
-
-  function Go_Purchase(){
-      $(".Speed_Purchasing").attr("action", "./product_Purchase.php");
-  }
-
-
-
-  function product_Register(){
-    window.open("./product_Register.php", "width:250px, height:250px");
-  }
-
-  function product_List(){
-      window.onload = function(){
-                        document.session_submit.Submit1.click();
-                }
+    function ajax(){
+        $.ajax({
+          url:"../Controller/Controller.php",
+          type: "post",
+          data:$("form").serialize()
+        }).done(function (data){
+          $("#loginResult").append(data);
+        });
     }
+
+    function popularProduct(){
+        $.ajax({
+            url:"../Controller/Controller.php",
+            type: "post",
+            data: {function: "popularProduct"},
+        }).done(function (data){
+            $(".row").html(data);
+        });
+    }
+
+
+    function user_Join(){
+      window.open("./user_Join.php","user register", "width:250px, height:250px");
+    }
+
+
+    function Go_Cart(){
+        $(".Speed_Purchasing").attr("action", "../Controller/product_Cart.php");
+
+    }
+
+
+    function Go_Purchase(){
+        $(".Speed_Purchasing").attr("action", "./product_Purchase.php");
+    }
+
+
+
+    function product_Register(){
+      window.open("./product_Register.php", "width:250px, height:250px");
+    }
+
+    function product_List(){
+        window.onload = function(){
+                          document.session_submit.Submit1.click();
+                  }
+      }
 
 
 </script>

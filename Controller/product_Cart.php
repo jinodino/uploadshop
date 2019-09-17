@@ -4,7 +4,7 @@ include '../Model/db_Processing.php';
 
 $db_con = new mysqli(DB_info::DB_URL, DB_info::DB_HOST,
                       DB_info::DB_PW, DB_info::DB_NAME);
-
+$db_con->set_charset("utf8");
 $process_query = new process();
 
 $user_num   = $_POST['user_num'];

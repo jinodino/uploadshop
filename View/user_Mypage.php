@@ -12,25 +12,158 @@ $_POST['user_name'];
  <head>
    <!-- bootstrap CDN Code Import-->
    <!-- Latest compiled and minified CSS -->
-   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+   <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
    <!-- jQuery library -->
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
    <!-- Popper JS -->
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script> -->
    <!-- Latest compiled JavaScript -->
-   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+   <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></!--> -->
+   <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
 
+<!-- modal 관련 link -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
- <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <style>
 
-    * {
-      margin: 10px 50px 10px 50px;
+    body {
+      /* margin: 10px 50px 10px 50px; */
+      margin: 0 auto;
+      width: 1200px;
     }
+
+    .listup-container {
+        margin: 25px 0;
+    }
+    .left-div {
+        float: left;
+        width: 50%;
+        height: 400px;  
+        padding-right: 20px;
+
+    }
+
+    
+    .right-div {
+        float: left;
+        width: 50%; 
+        height: 400px;  
+        padding-left: 20px;
+
+    }    
+
+
+    .customer-listup-container-header, .product-listup-container-header {
+        font-size: 23px;
+        font-weight: bold;
+    }
+
+    .product-listup-container-footer, .customer-listup-container-footer {
+        padding: 0 160px;
+    }   
+
+    /* bootstrap css */
+    .pagination {
+        margin: 5px 0;
+    }
+
+    /* table css */
+    .product-table-thead {
+        opacity: 0.8;
+        background: blanchedalmond;
+    }
+
+    .customer-table-thead {
+        opacity: 0.8;
+        background: whitesmoke;
+    }
+
+    .product-listup-container-body {
+        height: 285px;
+    }
+
+    .customer-listup-container-body {
+        height: 285px;
+    }
+
+    .product-table-tbody tr:hover {
+        background-color: aliceblue;
+        font-weight: bold;
+    }
+
+    .customer-table-tbody tr:hover {
+        background-color: aliceblue;
+        font-weight: bold;
+    }
+
+
+    /*　modal  */
+    .modal-container {
+        margin: 6.75rem auto;
+    }
+
+    .modal-header {
+        padding: 1rem 1rem 0.5rem 1rem;
+    }
+
+    .info-title {
+        font-weight: bold;
+        font-size  : 15px;
+    }
+    
+    .info-container {
+        margin: 5px 0;
+    }
+    
+    .info-id, .info-name, .info-phone{
+        font-weight: 600;
+    }
+    
+    .product-img-tag
+    {
+        margin: 10px 0;
+        width: 200px;
+        height: 200px;
+        max-width: 200px;
+        max-height: 200px;
+    }
+
+    .change-button-frame {
+        display: inline;
+    }
+
+    .close-button-frame {
+        display: inline;
+    }
+
+    .order-info-table thead {
+        background-color: mistyrose;
+    }
+
+    .order-info-table > thead > tr > th:nth-child(1) {
+        min-width: 100px;
+    }
+
+    .order-info-table > thead > tr > th:nth-child(2) {
+        min-width: 50px;
+    }
+
+    .order-info-table > thead > tr > th:nth-child(3) {
+        min-width: 300px;
+    }
+
+    .order-info-table > thead > tr > th:nth-child(4) {
+        max-width: 120px;
+    }
+
+
 
 </style>
 </head>
+<body onload="listupInfo()">
+  
+</body>
 
 <center>
 <?php 
@@ -45,9 +178,13 @@ $result = mysqli_query($db_con,$query);
 $row = mysqli_fetch_array($result);
 
  ?>
+ <?php 
+    include "./manager_List.php";
+    include "./listModal.php";
+?>
 <center>
     <hr />
-
+    
     <div id="ordercheck">
 
         <h3>注文確認欄</h3>
@@ -139,7 +276,155 @@ while ($Ordercheck_row = mysqli_fetch_array($Ordercheck_result)) {?>
 </center>
 
 <script>
-function Go_Purchase(){
-    $("#ProductForm").attr("action", "./product_Purchase.php");
+    function Go_Purchase(){
+        $("#ProductForm").attr("action", "./product_Purchase.php");
+    }
+
+    function listupInfo(){
+        $.ajax({
+            url:"../Controller/Controller.php",
+            type: "post",
+            data: {
+                function: "listupInfo",
+            },
+        }).done(function (data){
+
+            var info = JSON.parse(data);
+
+            $(".product-table-tbody").html(info["productListUp"]);
+            $(".customer-table-tbody").html(info["customerListup"]);
+            $(".product-listup-container-footer").html(info["productPagination"]);
+            $(".customer-listup-container-footer").html(info["customerPagination"]);
+        });
+
+    }
+
+    function nextPage(obj) {
+
+        $.ajax({
+            url:"../Controller/PaginationController.php",
+            type: "post",
+            data: {
+                function       : "pagination",
+                classification : obj.name,
+                page           : obj.getAttribute("value"),
+            },
+        }).done(function (data){
+            var info = JSON.parse(data);
+            if(obj.name == "product") {
+                $(".product-table-tbody").html(info["productListUp"]);
+                $(".product-listup-container-footer").html(info["productPagination"]);
+            }
+            else if (obj.name == "customer") {
+                $(".customer-table-tbody").html(info["customerListUp"]);
+                $(".customer-listup-container-footer").html(info["customerPagination"]);
+            }
+        });
+
+    }
+
+function selectInfo(id) {
+    var info = id.split('-');
+    
+    $.ajax({
+        url:"../Controller/SelectModalInfo.php",
+        type: "post",
+        data: {
+            id             : info[1],
+            classification : info[0]
+        },
+    }).done(function (data){
+        var res = JSON.parse(data);
+
+        if(info[0] == "product") {
+
+            console.log(res);
+            $('.product-num-hidden').text(res.p_num);
+            $('.product-name').text(res.p_name);
+            $('.product-price').text(res.p_price);
+            $('.product-memo').text(res.p_memo);
+            if(res.p_img != "") {
+                $('.product-img-tag').attr("src", "../Public/img/" + res.p_img);
+            } else {
+                $('.product-img-tag').attr("src", "http://design-ec.com/d/e_others_50/l_e_others_500.png");
+            }
+
+        }
+        else if(info[0] == "customer") {
+        
+            // userclass: "Customer"
+            $(".info-id").text("・" + res['userInfo'].userId + " (" + res['userInfo'].userclass + ")");
+            $(".info-name").text("・" + res['userInfo'].userName);
+            $(".info-phone").text("・" + res['userInfo'].userPhone);
+
+            var orderListString = "";
+
+            res['orderInfo'].forEach(element => {
+                orderListString += "<tr>";
+                element.forEach(list => {
+                    orderListString += "<td>" + list + "</td>";
+                });
+                orderListString += "</tr>";
+            });
+
+            $('.customer-order-list').html(orderListString);
+        }
+    });
 }
+function changeInfo() {
+    var name = $('.product-name').text();
+    $('.product-name').html("<input type='text' value=" + name + ">");
+
+    var price = $('.product-price').text();
+    $('.product-price').html("<input type='text' value=" + price + ">");
+
+    var memo = $('.product-memo').text();
+    $('.product-memo').html("<input type='text' value=" + memo + ">");
+
+    var num = $('.product-num-hidden').text();
+    $('.img-change').html("<input type='file' id='filedata' name='uploadfile'>");
+    
+    $('.change-button-frame').html("<button type='button' class='btn btn-default' onclick='change()'>Change</button>");
+}
+
+function change() {
+    var formData = new FormData();
+    
+    var num = $(".product-num-hidden").text();
+    var name = $(".product-name input").val(); 
+    var price = $(".product-price input").val(); 
+    var memo = $(".product-memo input").val();
+    var file_data = $("#filedata").prop("files")[0]; 
+
+    formData.append("num", num);
+    formData.append("file", file_data);
+    formData.append("name", name);
+    formData.append("price", price);
+    formData.append("memo", memo);
+
+    $.ajax({
+
+        url:"../Controller/ChangeInfoController.php",
+        dataType: "text",  
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: "post",
+        data: formData,
+
+    }).done(function (data){
+        $(".product-name").text(name); 
+        $(".product-price").text(price); 
+        $(".product-memo").text(memo);
+        $(".img-change").html(""); 
+        $(".product-img-tag").attr("src", data); 
+        $('.change-button-frame').html("<button type='button' class='btn btn-default' onclick='changeInfo()'>Change</button>");
+    });
+}
+
+function closeModal() {
+    $(".img-change").html(" ");
+    $(".change-button-frame").html("<button type='button' class='btn btn-default' onclick='changeInfo()'>Change</button>");
+}
+
 </script>

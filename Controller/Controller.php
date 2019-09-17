@@ -13,6 +13,7 @@ $db_con = new mysqli(DB_info::DB_URL, DB_info::DB_HOST,
 if($db_con->connect_error){
   die("Failed to connet to DataBase".$db_con->connet_error);
 }
+$db_con->set_charset("utf8");
 
 /*********************************************************************/
 /*********************************************************************/
@@ -168,4 +169,205 @@ echo "<script>alert('Order Complete! Thank you for your purchase :) you can chec
 echo "<script>location.href = '../View/main.php'</script>";
 }
 
+
+
+if($function == "popularProduct") {
+    // $query    =   "select * from product_list where p_num=9";
+    $query    = "select 
+                    o.p_num, count(*) as popular, p.p_name, p.p_img, p.p_memo, p.p_price
+                  from
+                    order_list as o, product_list as p
+                  where
+                    o.p_num = p.p_num
+                  group by
+                    o.p_num
+                  order by
+                    popular desc
+                  limit 4";
+    $result   =   mysqli_query($db_con,$query);
+    $user_num_query = "select user_num from user_list where user_id = '". $_SESSION['user_id']."'" ;
+    $user_num_result = mysqli_query($db_con,$user_num_query);
+    $user_num_row = mysqli_fetch_array($user_num_result);
+    
+    $contents = "";
+    while($row  =   mysqli_fetch_array($result)) {
+      // print_r($row);
+      $contents .= "<form method='post' class='Speed_Purchasing'>";
+      $contents .= "    <div class='col-xs-3 col-md-3' style='margin:0px;'>";
+      $contents .= "        <div class='thumbnail'>";
+      $contents .= "            <input type='hidden' name='p_num' value=" . $row['p_num'] . "/>" ;
+      $contents .= "            <input type='hidden' name='p_count' value='1'/>";
+      $contents .= "            <input type='hidden' name='p_price'  value=" . $row['p_price'] . "/>";
+      $contents .= "            <input type='hidden' name='user_num' value=" . $user_num_row['user_num'] . "/>";
+      $contents .= "            <input type='hidden' name='user_id' value=" . $_SESSION['user_id'] . "/><input type='hidden' name='user_name' value=" . $_SESSION['user_name'] . "/>";
+      $contents .= "            <img src='../Public/img/" . $row['p_img'] . "'>";
+      $contents .= "            <div class='caption'>";
+      $contents .= "                <h3><strong>" . $row['p_name'] . "</strong></h3>";
+      $contents .= "                <p>" . $row['p_memo'] . "</p>";
+      $contents .= "                <b>" . $row['p_price'] . "円</b><br><br>";
+      $contents .= "                <input type='submit' button class='btn btn-warning btn-lg' value= 'Buy' onclick='Go_Purchase()'>";
+      $contents .= "                <input type='image' button class='btn btn-success btn-lg' src='../Public/img/KAGO2.png' onclick='Go_Cart()'>";
+      $contents .= "            </div>";
+      $contents .= "        </div>";
+      $contents .= "   </div>";
+      $contents .= "</form>";
+    }
+    
+
+
+    echo $contents;
+
+    
+}
+
+
+
+
+
+if($function == "listupInfo") {
+
+
+    $productListUpContents  = "";
+    $customerListUpContents = "";
+    $query    = "select 
+          *
+        from
+          product_list
+        order by
+          p_num desc
+        limit 0, 5";
+        
+
+    $result   =   mysqli_query($db_con, $query);
+
+    
+    while($row  =   mysqli_fetch_array($result)) {
+      // $productListUpContents .= "<tr onclick='modalInfo(this);'  name='productModal' id='" . $row['p_num'] . "'>";
+      $productListUpContents .= "<tr data-toggle='modal' data-target='#productModal' onclick='selectInfo(id)'  name='productModal' id='product-" . $row['p_num'] . "'>";
+      $productListUpContents .= "    <th scope='row'>" . $row['p_num'] . "</th>";
+      $productListUpContents .= "    <td>" . $row['p_name'] . "</td>";
+      $productListUpContents .= "    <td>" . $row['p_price'] . "</td>";
+      $productListUpContents .= "</tr>";
+    }
+
+    $query    = "select 
+          *
+        from
+          user_list
+        order by
+          user_num desc
+        limit 0, 5";
+
+    $result   =   mysqli_query($db_con, $query);
+    
+    while($row  =   mysqli_fetch_array($result)) {
+        // $customerListUpContents .= "<tr onclick='modalInfo(this);'   name='customerModal' id='" . $row['user_id'] . "'>";
+        $customerListUpContents .= "<tr data-toggle='modal' data-target='#customerModal' onclick='selectInfo(id)'  name='customerModal' id='customer-" . $row['user_id'] . "'>";
+        $customerListUpContents .= "    <th scope='row'>" . $row['user_num'] . "</th>";
+        $customerListUpContents .= "    <td>" . $row['user_id'] . "</td>";
+        $customerListUpContents .= "    <td>" . $row['user_name'] . "</td>";
+        $customerListUpContents .= "</tr>";
+    }
+
+
+    // pagination
+
+    $productpaginationContents = "";
+    $productpaginationContents .= "<nav aria-label='Page navigation example'>";
+    $productpaginationContents .= "  <ul class='pagination'>";
+
+    $productpaginationContents .= "    <li class='page-item'>";
+    $productpaginationContents .= "      <a class='page-link' href='#' aria-label='Previous' onclick='nextPage(this)' value='0' name='product'>";
+    $productpaginationContents .= "        <span aria-hidden='true'>&laquo;</span>";
+    $productpaginationContents .= "        <span class='sr-only'>Previous</span>";
+    $productpaginationContents .= "      </a>";
+    $productpaginationContents .= "    </li>";
+    
+  
+    $query    = "select 
+                  *
+                from
+                  product_list";
+
+    $result = mysqli_query($db_con, $query);
+    $numRow = ceil(mysqli_num_rows($result) / 5) - 1;
+
+    if($numRow > 5) {
+      for ($i=0; $i < 5; $i++) { 
+        $productpaginationContents .= "<li class='page-item'><a class='page-link' onclick='nextPage(this)' value='$i' name='product'>" . ($i + 1) . "</a></li>";
+      }
+    } else {
+      for ($i=0; $i <= $numRow; $i++) { 
+        $productpaginationContents .= "<li class='page-item'><a class='page-link' onclick='nextPage(this)' value='$i' name='product'>" . ($i + 1) . "</a></li>";
+      }
+    }
+
+    
+
+    $productpaginationContents .= "    <li class='page-item'>";
+    $productpaginationContents .= "      <a class='page-link' href='#' aria-label='Next' onclick='nextPage(this)' value='" . $numRow . "' name='product'>";
+    $productpaginationContents .= "        <span aria-hidden='true'>&raquo;</span>";
+    $productpaginationContents .= "        <span class='sr-only'>Next</span>";
+    $productpaginationContents .= "      </a>";
+    $productpaginationContents .= "    </li>";
+    $productpaginationContents .= "  </ul>";
+    $productpaginationContents .= "</nav>";
+
+    // customer
+
+    $customerpaginationContents = "";
+    $customerpaginationContents .= "<nav aria-label='Page navigation example'>";
+    $customerpaginationContents .= "  <ul class='pagination'>";
+
+    $customerpaginationContents .= "    <li class='page-item'>";
+    $customerpaginationContents .= "      <a class='page-link' href='#' aria-label='Previous' onclick='nextPage(this)' value='0' name='customer'>";
+    $customerpaginationContents .= "        <span aria-hidden='true'>&laquo;</span>";
+    $customerpaginationContents .= "        <span class='sr-only'>Previous</span>";
+    $customerpaginationContents .= "      </a>";
+    $customerpaginationContents .= "    </li>";
+    
+  
+    $query    = "select 
+                  *
+                from
+                  user_list";
+
+    $result = mysqli_query($db_con, $query);
+    $numRow = ceil(mysqli_num_rows($result) / 5) - 1;
+    
+
+    if($numRow > 5) {
+      for ($i=0; $i < 5; $i++) { 
+        $customerpaginationContents .= "<li class='page-item'><a class='page-link' onclick='nextPage(this)' value='$i' name='customer'>" . ($i + 1) . "</a></li>";
+      }
+    } else {
+      for ($i=0; $i <= $numRow; $i++) { 
+        $customerpaginationContents .= "<li class='page-item'><a class='page-link' onclick='nextPage(this)' value='$i' name='customer'>" . ($i + 1) . "</a></li>";
+      }
+    }
+
+    $customerpaginationContents .= "    <li class='page-item'>";
+    $customerpaginationContents .= "      <a class='page-link' href='#' aria-label='Next' onclick='nextPage(this)' value='" . $numRow . "' name='customer'>";
+    $customerpaginationContents .= "        <span aria-hidden='true'>&raquo;</span>";
+    $customerpaginationContents .= "        <span class='sr-only'>Next</span>";
+    $customerpaginationContents .= "      </a>";
+    $customerpaginationContents .= "    </li>";
+    $customerpaginationContents .= "  </ul>";
+    $customerpaginationContents .= "</nav>";
+
+    $result = array(
+      'productListUp' => $productListUpContents,
+      'customerListup' => $customerListUpContents,
+      'productPagination' => $productpaginationContents,
+      'customerPagination' => $customerpaginationContents
+    );
+    echo json_encode($result);
+    
+}
+
+
+
+
+
  ?>
+
